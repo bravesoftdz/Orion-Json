@@ -49,7 +49,7 @@ begin
     end
     else if lJson is TJSONArray then begin
       if Self.ClassName.Contains('TObjectList<') then begin
-        TObjectList<TObject>(lProperty.GetValue(Pointer(Self)).AsObject).Clear;
+        TObjectList<TObject>(Self).Clear;
         SetValueToObjectList(lJson.ToJSON, TObjectList<TObject>(Self));
       end;
 
@@ -85,6 +85,7 @@ function TOrionJSON.ToJSONArray: TJSONArray;
 var
   lJsonArray : TJSONArray;
 begin
+  Result := nil;
   if Self.QualifiedClassName.Contains('TObjectList<') then begin
     lJsonArray := TJSONArray.Create;
     try
@@ -116,14 +117,13 @@ end;
 
 function TOrionJSON.ToJSONString(aPretty : boolean = false) : string;
 var
-  lContext : TRttiContext;
-  lType : TRttiType;
-  lProperty : TRttiProperty;
   lJson : TJSONObject;
   lJsonArray : TJSONArray;
 begin
-  lContext := TRttiContext.Create;
-  lType := lContext.GetType(Self.ClassInfo);
+  Result := '';
+  if not Assigned(Self) then
+    Exit;
+
   if Self.QualifiedClassName.Contains('TObjectList<') then begin
     lJsonArray := TJSONArray.Create;
     try
@@ -223,8 +223,6 @@ end;
 
 procedure TOrionJSON.SetValueToJson(lProperty : TRttiProperty; var aJson : TJSONObject);
 var
-  lObject: TObject;
-  lJsonObject : TJSONObject;
   lJsonArray : TJSONArray;
 begin
   case lProperty.PropertyType.TypeKind of
