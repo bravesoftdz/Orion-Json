@@ -86,15 +86,12 @@ var
   lJsonArray : TJSONArray;
 begin
   Result := nil;
-  if Self.QualifiedClassName.Contains('TObjectList<') then begin
-    lJsonArray := TJSONArray.Create;
-    try
-      SetValueToJsonArray(TObjectList<TObject>(Self), lJsonArray);
-      Result := lJsonArray;
-    finally
-      FreeAndNil(lJsonArray);
-    end;
-  end;
+  if not Self.QualifiedClassName.Contains('TObjectList<') then
+    Exit;
+
+  lJsonArray := TJSONArray.Create;
+  SetValueToJsonArray(TObjectList<TObject>(Self), lJsonArray);
+  Result := lJsonArray;
 end;
 
 function TOrionJSON.ToJSONObject: TJSONObject;
@@ -120,10 +117,6 @@ var
   lJson : TJSONObject;
   lJsonArray : TJSONArray;
 begin
-  Result := '';
-  if not Assigned(Self) then
-    Exit;
-
   if Self.QualifiedClassName.Contains('TObjectList<') then begin
     lJsonArray := TJSONArray.Create;
     try
